@@ -20,6 +20,12 @@ public extension UIStackView {
     }
 
     @discardableResult
+    func addArranged(_ content: @escaping() -> UIView) -> Self {
+        addArrangedSubview(content())
+        return self
+    }
+
+    @discardableResult
     func distribution(_ distribution: UIStackView.Distribution) -> Self {
         self.distribution = distribution
         return self
@@ -67,18 +73,14 @@ public extension UIStackView {
     }
 
     @discardableResult
-    func spacer(height: CGFloat) -> Self {
-        addArranged(
-            FixedSpacer(height: height)
-        )
+    func verticalStack(content: @escaping (UIStackView) -> UIView) -> Self {
+        addArranged(content(VerticalStack()))
         return self
     }
 
     @discardableResult
-    func spacer(width: CGFloat) -> Self {
-        addArranged(
-            FixedSpacer(width: width)
-        )
+    func horizontalStack(content: @escaping (UIStackView) -> UIView) -> Self {
+        addArranged(content(HorizontalStack()))
         return self
     }
 

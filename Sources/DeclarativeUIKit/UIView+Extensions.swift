@@ -12,6 +12,13 @@ public extension UIView {
 
     @discardableResult
     func add(_ view: UIView, padding: CGFloat) -> Self {
+        let edgeInsets = DeclarativeEdgeInsets(top: padding, leading: padding, bottom: padding, trailing: padding)
+        add(view, padding: edgeInsets)
+        return self
+    }
+
+    @discardableResult
+    func add(_ view: UIView, padding: DeclarativeEdgeInsets) -> Self {
         addSubview(view)
         view.expand(to: self, padding: padding)
         return self
@@ -27,10 +34,25 @@ public extension UIView {
 
     @discardableResult
     func expand(to view: UIView, padding: CGFloat) -> Self {
-        connect(\.topAnchor, to: view.topAnchor, padding: padding)
-        connect(\.leadingAnchor, to: view.leadingAnchor, padding: padding)
-        connect(\.trailingAnchor, to: view.trailingAnchor, padding: -padding)
-        connect(\.bottomAnchor, to: view.bottomAnchor, padding: -padding)
+        let edgeInsets = DeclarativeEdgeInsets(top: padding, leading: padding, bottom: padding, trailing: padding)
+        expand(to: view, padding: edgeInsets)
+        return self
+    }
+
+    @discardableResult
+    func expand(to view: UIView, padding: DeclarativeEdgeInsets) -> Self {
+        if #available(iOS 11.0, *) {
+            connect(\.topAnchor, to: view.safeAreaLayoutGuide.topAnchor, padding: padding.top)
+            connect(\.leadingAnchor, to: view.safeAreaLayoutGuide.leadingAnchor, padding: padding.leading)
+            connect(\.trailingAnchor, to: view.safeAreaLayoutGuide.trailingAnchor, padding: -padding.trailing)
+            connect(\.bottomAnchor, to: view.safeAreaLayoutGuide.bottomAnchor, padding: -padding.bottom)
+        } else {
+            connect(\.topAnchor, to: view.topAnchor, padding: padding.top)
+            connect(\.leadingAnchor, to: view.leadingAnchor, padding: padding.leading)
+            connect(\.trailingAnchor, to: view.trailingAnchor, padding: -padding.trailing)
+            connect(\.bottomAnchor, to: view.bottomAnchor, padding: -padding.bottom)
+        }
+
         return self
     }
 
@@ -90,6 +112,11 @@ public extension UIView {
         return self
     }
 
+    func set(contentHuggingPriority: UILayoutPriority, for axis: NSLayoutConstraint.Axis) -> Self {
+        self.setContentHuggingPriority(contentHuggingPriority, for: axis)
+        return self
+    }
+
     // MARK: - backgroungColor
 
     @discardableResult
@@ -98,7 +125,7 @@ public extension UIView {
         return self
     }
 
-    // MARK: - corner
+    // MARK: - corner radius
 
     @discardableResult
     func cornerRadius(_ radius: CGFloat) -> Self {
@@ -109,6 +136,14 @@ public extension UIView {
 
     @discardableResult
     func childPadding(_ value: CGFloat) -> Self {
+        guard let child = subviews.first else { return self }
+        child.removeFromSuperview()
+        add(child, padding: value)
+        return self
+    }
+
+    @discardableResult
+    func childPadding(_ value: DeclarativeEdgeInsets) -> Self {
         guard let child = subviews.first else { return self }
         child.removeFromSuperview()
         add(child, padding: value)
@@ -131,4 +166,11 @@ public struct DeclarativeEdgeInsets {
     let leading: CGFloat
     let bottom: CGFloat
     let trailing: CGFloat
+
+    public init(top: CGFloat, leading: CGFloat, bottom: CGFloat, trailing: CGFloat) {
+        self.top = top
+        self.leading = leading
+        self.bottom = bottom
+        self.trailing = trailing
+    }
 }
