@@ -15,13 +15,11 @@ public extension UIStackView {
 
     @discardableResult
     func addArranged(_ view: UIView) -> Self {
-        addArrangedSubview(view)
-        return self
-    }
-
-    @discardableResult
-    func addArranged(_ content: @escaping() -> UIView) -> Self {
-        addArrangedSubview(content())
+        if let view = view as? Spacer {
+            addSpacer(view)
+        } else {
+            addArrangedSubview(view)
+        }
         return self
     }
 
@@ -43,57 +41,39 @@ public extension UIStackView {
         return self
     }
 
-    /// Spacer mimics the same behavior as Spacer in SwiftUI.
-    /// For more information, see [SwiftUI Spacer](https://developer.apple.com/documentation/swiftui/spacer)
-    ///
-    /// Usage example:
-    ///
-    /// If you want to "push" a view to the right edge of the screen:
-    /// ```
-    ///     HorizontalStack()
-    ///         .spacer()
-    ///         .addArranged(
-    ///             UIView()
-    ///         )
-    /// ```
-    /// If you want to **centralize** a view:
-    /// ```
-    ///     HorizontalStack() // or vertical
-    ///         .spacer()
-    ///         .addArranged(
-    ///             UIView()
-    ///         )
-    ///         .spacer()
-    /// ```
-    ///
     @discardableResult
-    func spacer() -> Self {
-        setupNewSpacer(Spacer())
-        return self
+    func spacer(width: CGFloat? = nil, height: CGFloat? = nil) -> Self {
+        addArranged(Spacer(width: width, height: height))
     }
 
-    @discardableResult
-    func verticalStack(content: @escaping (UIStackView) -> UIView) -> Self {
-        addArranged(content(VerticalStack()))
-        return self
-    }
-
-    @discardableResult
-    func horizontalStack(content: @escaping (UIStackView) -> UIView) -> Self {
-        addArranged(content(HorizontalStack()))
-        return self
-    }
-
-    private func setupNewSpacer(_ spacer: Spacer) {
+    private func addSpacer(_ spacer: Spacer) {
         addArrangedSubview(spacer)
-        applyEqualHeightsIfManySpacers(spacer)
+        if !spacer.hasFixedSize {
+            applyEqualSizeIfManySpacers(spacer)
+        }
     }
-    
-    private func applyEqualHeightsIfManySpacers(_ spacer: Spacer) {
+
+    // Find the first spacer which doesn't have a fixed size
+    // and apply equal heights and width for the new spacer
+    private func applyEqualSizeIfManySpacers(_ spacer: Spacer) {
+        guard !spacer.hasFixedSize else { return }
         guard arrangedSubviews.count > 1 else { return }
-        let existingSpacer = arrangedSubviews.first { $0.self is Spacer }
-        existingSpacer?
+
+        let nonFixedSizeSpacer = arrangedSubviews.firstSpacer { !$0.hasFixedSize }
+        nonFixedSizeSpacer?
             .connect(\.heightAnchor, to: spacer.heightAnchor)
             .connect(\.widthAnchor, to: spacer.widthAnchor)
+    }
+}
+
+private extension Array where Element: UIView {
+    func firstSpacer(where condition: @escaping(Spacer) -> Bool) -> Spacer? {
+        first {
+            guard let spacer = $0.self as? Spacer else {
+                return false
+            }
+
+            return condition(spacer)
+        } as? Spacer
     }
 }
