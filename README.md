@@ -221,12 +221,20 @@ class DeclarativeViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // The following add is equivalent to:
+        // content.translatesAutoresizingMaskIntoConstraints = false
+        // view.addSubview(content)
+        // content.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        // content.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
+        // content.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
+        // content.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         view.add(content)
     }
 }
 ```
 
-### 4. Use Spacers
+### 4. Use Spacers if needed
 Spacers will try to expand, so we can use it to move content around and allow certain areas to grow, avoiding layout issues.
 
 E.g.: to push content to the bottom:
@@ -242,10 +250,9 @@ class DeclarativeViewController: UIViewController {
     ...
 }
 ```
-See more in `Use Spacers to push content around`.
+See more in [Use Spacers to push content around](#use-spacers-to-push-content-around).
 
 ### 5. Run and enjoy!
-Now you are ready to go.
 
 ## Tips
 
