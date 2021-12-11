@@ -6,4 +6,10 @@ public extension UITextField {
         self.placeholder = text
         return self
     }
+
+    @discardableResult
+    func text(_ text: String) -> Self {
+        self.text = text
+        return self
+    }
 }
