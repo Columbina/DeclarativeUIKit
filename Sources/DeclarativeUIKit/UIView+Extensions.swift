@@ -112,6 +112,13 @@ public extension UIView {
         return self
     }
 
+    @discardableResult
+    func set(compressionResistance priority: UILayoutPriority, for axis: NSLayoutConstraint.Axis) -> Self {
+        self.setContentCompressionResistancePriority(priority, for: axis)
+        return self
+    }
+
+    @discardableResult
     func set(contentHuggingPriority: UILayoutPriority, for axis: NSLayoutConstraint.Axis) -> Self {
         self.setContentHuggingPriority(contentHuggingPriority, for: axis)
         return self

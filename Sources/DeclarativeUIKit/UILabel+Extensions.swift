@@ -32,18 +32,6 @@ public extension UILabel {
     }
 
     @discardableResult
-    func set(compressionResistance priority: UILayoutPriority, for axis: NSLayoutConstraint.Axis) -> UILabel {
-        self.setContentCompressionResistancePriority(priority, for: axis)
-        return self
-    }
-
-    @discardableResult
-    func set(huggingPriority priority: UILayoutPriority, for axis: NSLayoutConstraint.Axis) -> UILabel {
-        self.setContentHuggingPriority(priority, for: axis)
-        return self
-    }
-
-    @discardableResult
     func set(textAlignment alignment: NSTextAlignment) -> UILabel {
         self.textAlignment = alignment
         return self

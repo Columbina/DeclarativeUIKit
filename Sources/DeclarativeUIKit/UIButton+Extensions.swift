@@ -1,8 +1,9 @@
-//
-//  File.swift
-//  
-//
-//  Created by Eduardo Domene on 06.12.21.
-//
+import UIKit
 
-import Foundation
+public extension UIButton {
+    @discardableResult
+    func set(title: String, for state: UIControl.State) -> Self {
+        self.setTitle(title, for: state)
+        return self
+    }
+}
