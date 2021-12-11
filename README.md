@@ -62,6 +62,17 @@ class DeclarativeViewController: UIViewController {
 }
 ```
 
+## Requirements
+- XCode 11.4+
+- Swift 5.2+
+- iOS 10+
+
+## Features
+- More readable code
+- Less lines of code
+- No fancy classes, so you don't need to subclass or use anything else other than plain UIKit.
+- Same naming for well known methods, so you can just follow your instincts.
+
 ## Example
 Let's recreate the following view:
 
@@ -431,4 +442,40 @@ class DeclarativeViewController: UIViewController {
         view.add(content).backgroundColor(.white)
     }
 }
+```
+
+### Preview Canvas
+Even if your app doesn't support SwiftUI or iOS 13, you can still take advantage of the Preview Canvas. This functionality is not included in this framework since you probably would have to add some additional flags to your project. However, if you still want to use it, here is how you can do it:
+
+1. Add a `UIViewControllerRepresentable` as a container:
+```swift
+@available(iOS 13.0, *)
+struct ViewControllerContainer: UIViewControllerRepresentable {
+    let viewController: () -> UIViewController
+
+    init(_ viewController: @escaping () -> UIViewController) {
+        self.viewController = viewController
+    }
+
+    func makeUIViewController(context: Context) -> some UIViewController {
+        viewController()
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {}
+}
+```
+2. Add a preview at the bottom of your View Controller file:
+```swift
+#if DEBUG
+import SwiftUI
+
+@available(iOS 13.0, *)
+struct MyViewController_Previews: PreviewProvider {
+    static var previews: some View {
+        ViewControllerPreview {
+            MyViewController()
+        }
+    }
+}
+#endif
 ```
