@@ -186,13 +186,13 @@ Repositioning the elements is as easy as swapping the "addArranged" functions ar
 ### Why DeclarativeUIKit?
 The main reasons why your team might want to use this framework are:
 - It supports older iOS versions (iOS 10+).
-- It's faster than using pure UIKit.
+- It's faster to develop than using pure UIKit.
 - It's more readable than pure UIKit with constraints.
 - DeclarativeUIKit makes a good transitioning tool into SwiftUI, since it borrows some characteristics from it (like the declarative look and use of spacers) while being totally compatible with UIKit elements.
 - It's easier to grasp than SwiftUI.
 
 ### What DeclarativeUIKit is and is not
-**DeclarativeUIKit is an expansion on UIKit and not a SwiftUI copy**. Therefore, setters found in UIKit classes will have a counterpart which returns the object itself, while keeping the same naming whenever possible, which is not the case with SwiftUI. For instance, when setting the background color of a UIKit view to green, we call `view.backgroundColor = .green`. This framework will provide you a function with the same name, `view.backgroundColor(.green)`, different from SwiftUI, which would be `view.background(Color.green)`. Although we try to keep the same names, there are some cases where this is not possible, like with `addArrangedSubview` and other methods in general.
+**DeclarativeUIKit is an expansion on UIKit and not a SwiftUI alternative**. Therefore, setters found in UIKit classes will have a counterpart which returns the object itself, while keeping the same naming whenever possible, which is not the case with SwiftUI. For instance, when setting the background color of a UIKit view to green, we call `view.backgroundColor = .green`. This framework will provide you a function with the same name, `view.backgroundColor(.green)`, different from SwiftUI, which would be `view.background(Color.green)`. Although we try to keep the same names, there are some cases where this is not possible, like with `addArrangedSubview` and other methods in general.
 
 DeclarativeUIKit doesn't do any magic behind the curtains, it just abstracts the use of constraints. Therefore, the autolayout rules are the same here. Despite that, we may borrow some elements and concepts from SwiftUI, like the `Spacer`, just because there is no equivalent in UIKit, and it makes our life easier.
 
