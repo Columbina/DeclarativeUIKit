@@ -5,47 +5,57 @@ public extension UIView {
     // MARK: - add
 
     @discardableResult
-    func add(_ view: UIView) -> Self {
-        add(view, padding: 0)
+    func add(_ view: UIView,
+             useSafeAreaLayoutGuide: Bool = false) -> Self {
+        add(view, padding: 0, useSafeAreaLayoutGuide: useSafeAreaLayoutGuide)
         return self
     }
 
     @discardableResult
-    func add(_ view: UIView, padding: CGFloat) -> Self {
+    func add(_ view: UIView,
+             padding: CGFloat,
+             useSafeAreaLayoutGuide: Bool = false) -> Self {
         let edgeInsets = DeclarativeEdgeInsets(top: padding, leading: padding, bottom: padding, trailing: padding)
-        add(view, padding: edgeInsets)
+        add(view, padding: edgeInsets, useSafeAreaLayoutGuide: useSafeAreaLayoutGuide)
         return self
     }
 
     @discardableResult
-    func add(_ view: UIView, padding: DeclarativeEdgeInsets) -> Self {
+    func add(_ view: UIView,
+             padding: DeclarativeEdgeInsets,
+             useSafeAreaLayoutGuide: Bool = false) -> Self {
         addSubview(view)
-        view.expand(to: self, padding: padding)
+        view.expand(to: self, padding: padding, useSafeAreaLayoutGuide: useSafeAreaLayoutGuide)
         return self
     }
 
     // MARK: - expand
 
     @discardableResult
-    func expand(to view: UIView) -> Self {
-        expand(to: view, padding: 0)
+    func expand(to view: UIView, useSafeAreaLayoutGuide: Bool = false) -> Self {
+        expand(to: view, padding: 0, useSafeAreaLayoutGuide: useSafeAreaLayoutGuide)
         return self
     }
 
     @discardableResult
-    func expand(to view: UIView, padding: CGFloat) -> Self {
+    func expand(to view: UIView, padding: CGFloat, useSafeAreaLayoutGuide: Bool = false) -> Self {
         let edgeInsets = DeclarativeEdgeInsets(top: padding, leading: padding, bottom: padding, trailing: padding)
-        expand(to: view, padding: edgeInsets)
+        expand(to: view, padding: edgeInsets, useSafeAreaLayoutGuide: useSafeAreaLayoutGuide)
         return self
     }
 
     @discardableResult
-    func expand(to view: UIView, padding: DeclarativeEdgeInsets) -> Self {
+    func expand(to view: UIView, padding: DeclarativeEdgeInsets, useSafeAreaLayoutGuide: Bool = false) -> Self {
         if #available(iOS 11.0, *) {
-            connect(\.topAnchor, to: view.safeAreaLayoutGuide.topAnchor, padding: padding.top)
-            connect(\.leadingAnchor, to: view.safeAreaLayoutGuide.leadingAnchor, padding: padding.leading)
-            connect(\.trailingAnchor, to: view.safeAreaLayoutGuide.trailingAnchor, padding: -padding.trailing)
-            connect(\.bottomAnchor, to: view.safeAreaLayoutGuide.bottomAnchor, padding: -padding.bottom)
+            let topAnchor = useSafeAreaLayoutGuide ? view.safeAreaLayoutGuide.topAnchor : view.topAnchor
+            let leadingAnchor = useSafeAreaLayoutGuide ? view.safeAreaLayoutGuide.leadingAnchor : view.leadingAnchor
+            let trailingAnchor = useSafeAreaLayoutGuide ? view.safeAreaLayoutGuide.trailingAnchor : view.trailingAnchor
+            let bottomAnchor = useSafeAreaLayoutGuide ? view.safeAreaLayoutGuide.bottomAnchor : view.bottomAnchor
+
+            connect(\.topAnchor, to: topAnchor, padding: padding.top)
+            connect(\.leadingAnchor, to: leadingAnchor, padding: padding.leading)
+            connect(\.trailingAnchor, to: trailingAnchor, padding: -padding.trailing)
+            connect(\.bottomAnchor, to: bottomAnchor, padding: -padding.bottom)
         } else {
             connect(\.topAnchor, to: view.topAnchor, padding: padding.top)
             connect(\.leadingAnchor, to: view.leadingAnchor, padding: padding.leading)
@@ -99,16 +109,24 @@ public extension UIView {
     // MARK: - set
 
     @discardableResult
-    func set(_ keyPath: KeyPath<UIView, NSLayoutDimension>, to constant: CGFloat) -> Self {
+    func set(_ keyPath: KeyPath<UIView, NSLayoutDimension>,
+             to constant: CGFloat,
+             priority: UILayoutPriority = .required) -> Self {
         self.translatesAutoresizingMaskIntoConstraints = false
-        self[keyPath: keyPath].constraint(equalToConstant: constant).isActive = true
+        let constraint = self[keyPath: keyPath].constraint(equalToConstant: constant)
+        constraint.priority = priority
+        constraint.isActive = true
         return self
     }
 
     @discardableResult
-    func set(_ keyPath: KeyPath<UIView, NSLayoutDimension>, greaterThanOrEqualTo constant: CGFloat) -> Self {
+    func set(_ keyPath: KeyPath<UIView, NSLayoutDimension>,
+             greaterThanOrEqualTo constant: CGFloat,
+             priority: UILayoutPriority = .required) -> Self {
         self.translatesAutoresizingMaskIntoConstraints = false
-        self[keyPath: keyPath].constraint(greaterThanOrEqualToConstant: constant).isActive = true
+        let constraint = self[keyPath: keyPath].constraint(greaterThanOrEqualToConstant: constant)
+        constraint.priority = priority
+        constraint.isActive = true
         return self
     }
 
@@ -150,10 +168,11 @@ public extension UIView {
     }
 
     @discardableResult
-    func childPadding(_ value: DeclarativeEdgeInsets) -> Self {
+    func childPadding(_ value: DeclarativeEdgeInsets,
+                      useSafeAreaLayoutGuide: Bool = false) -> Self {
         guard let child = subviews.first else { return self }
         child.removeFromSuperview()
-        add(child, padding: value)
+        add(child, padding: value, useSafeAreaLayoutGuide: useSafeAreaLayoutGuide)
         return self
     }
 
