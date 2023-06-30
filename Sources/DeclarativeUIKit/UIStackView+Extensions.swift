@@ -15,11 +15,7 @@ public extension UIStackView {
 
     @discardableResult
     func addArranged(_ view: UIView) -> Self {
-        if let view = view as? Spacer {
-            addSpacer(view)
-        } else {
-            addArrangedSubview(view)
-        }
+        addArrangedSubview(view)
         return self
     }
 
@@ -42,29 +38,78 @@ public extension UIStackView {
     }
 
     @discardableResult
-    func spacer(width: CGFloat? = nil, height: CGFloat? = nil) -> Self {
-        addArranged(Spacer(width: width, height: height))
+    func addArranged(@DeclarativeViewBuilder viewBuilder: () -> [UIView]) -> Self {
+        viewBuilder().forEach { addArrangedSubview($0) }
+        return self
     }
 
-    private func addSpacer(_ spacer: Spacer) {
-        addArrangedSubview(spacer)
-        if !spacer.hasFixedSize {
-            applyEqualSizeIfManySpacers(spacer)
+    // Inspired by: https://developer.apple.com/documentation/swiftui/foreach
+    @discardableResult
+    func forEach<Data>(_ collection: Data, _ content: (Data.Element) -> UIView) -> Self where Data: RandomAccessCollection {
+        collection.forEach {
+            let content = content($0)
+            if content as? Spacer != nil {
+                spacer()
+            } else {
+                addArrangedSubview(content)
+            }
         }
+        return self
     }
 
-    // Find the first spacer which doesn't have a fixed size
-    // and apply equal heights and width for the new spacer
-    private func applyEqualSizeIfManySpacers(_ spacer: Spacer) {
-        guard !spacer.hasFixedSize else { return }
+    /// Spacer mimics the same behavior as Spacer in SwiftUI.
+    /// For more information, see [SwiftUI Spacer](https://developer.apple.com/documentation/swiftui/spacer)
+    ///
+    /// Usage example:
+    ///
+    /// If you want to "push" a view to the right edge of the screen:
+    /// ```
+    ///     HorizontalStack()
+    ///         .spacer()
+    ///         .addArranged(
+    ///             UIView()
+    ///         )
+    /// ```
+    /// If you want to **centralize** a view:
+    /// ```
+    ///     HorizontalStack() // or vertical
+    ///         .spacer()
+    ///         .addArranged(
+    ///             UIView()
+    ///         )
+    ///         .spacer()
+    /// ```
+    ///
+    @discardableResult
+    func spacer() -> Self {
+        let spacer = Spacer()
+        addArranged(spacer)
+        applyEqualHeightsIfManySpacers(spacer)
+        return self
+    }
+
+    @discardableResult
+    func spacer(height: CGFloat) -> Self {
+        addArranged(FixedSpacer(height: height))
+        return self
+    }
+
+    @discardableResult
+    func spacer(width: CGFloat) -> Self {
+        addArranged(FixedSpacer(width: width))
+        return self
+    }
+
+    private func applyEqualHeightsIfManySpacers(_ spacer: Spacer) {
         guard arrangedSubviews.count > 1 else { return }
 
-        let nonFixedSizeSpacer = arrangedSubviews.firstSpacer { !$0.hasFixedSize }
-        nonFixedSizeSpacer?
+        let existingSpacer = arrangedSubviews.first { $0.self is Spacer }
+        existingSpacer?
             .connect(\.heightAnchor, to: spacer.heightAnchor)
             .connect(\.widthAnchor, to: spacer.widthAnchor)
     }
 }
+
 
 private extension Array where Element: UIView {
     func firstSpacer(where condition: @escaping(Spacer) -> Bool) -> Spacer? {
@@ -77,3 +122,4 @@ private extension Array where Element: UIView {
         } as? Spacer
     }
 }
+
