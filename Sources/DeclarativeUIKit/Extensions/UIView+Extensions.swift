@@ -2,11 +2,22 @@ import UIKit
 
 public extension UIView {
 
+    var parentViewController: UIViewController? {
+        var parentResponder: UIResponder? = self
+        while parentResponder != nil {
+            parentResponder = parentResponder?.next
+            if let viewController = parentResponder as? UIViewController {
+                return viewController
+            }
+        }
+        return nil
+    }
+
     // MARK: - add
 
     @discardableResult
     func add(_ view: UIView,
-             useSafeAreaLayoutGuide: Bool = false) -> Self {
+             useSafeAreaLayoutGuide: Bool = true) -> Self {
         add(view, padding: 0, useSafeAreaLayoutGuide: useSafeAreaLayoutGuide)
         return self
     }
@@ -14,7 +25,7 @@ public extension UIView {
     @discardableResult
     func add(_ view: UIView,
              padding: CGFloat,
-             useSafeAreaLayoutGuide: Bool = false) -> Self {
+             useSafeAreaLayoutGuide: Bool = true) -> Self {
         let edgeInsets = DeclarativeEdgeInsets(top: padding, leading: padding, bottom: padding, trailing: padding)
         add(view, padding: edgeInsets, useSafeAreaLayoutGuide: useSafeAreaLayoutGuide)
         return self
@@ -23,7 +34,7 @@ public extension UIView {
     @discardableResult
     func add(_ view: UIView,
              padding: DeclarativeEdgeInsets,
-             useSafeAreaLayoutGuide: Bool = false) -> Self {
+             useSafeAreaLayoutGuide: Bool = true) -> Self {
         addSubview(view)
         view.expand(to: self, padding: padding, useSafeAreaLayoutGuide: useSafeAreaLayoutGuide)
         return self
@@ -32,20 +43,20 @@ public extension UIView {
     // MARK: - expand
 
     @discardableResult
-    func expand(to view: UIView, useSafeAreaLayoutGuide: Bool = false) -> Self {
+    func expand(to view: UIView, useSafeAreaLayoutGuide: Bool = true) -> Self {
         expand(to: view, padding: 0, useSafeAreaLayoutGuide: useSafeAreaLayoutGuide)
         return self
     }
 
     @discardableResult
-    func expand(to view: UIView, padding: CGFloat, useSafeAreaLayoutGuide: Bool = false) -> Self {
+    func expand(to view: UIView, padding: CGFloat, useSafeAreaLayoutGuide: Bool = true) -> Self {
         let edgeInsets = DeclarativeEdgeInsets(top: padding, leading: padding, bottom: padding, trailing: padding)
         expand(to: view, padding: edgeInsets, useSafeAreaLayoutGuide: useSafeAreaLayoutGuide)
         return self
     }
 
     @discardableResult
-    func expand(to view: UIView, padding: DeclarativeEdgeInsets, useSafeAreaLayoutGuide: Bool = false) -> Self {
+    func expand(to view: UIView, padding: DeclarativeEdgeInsets, useSafeAreaLayoutGuide: Bool = true) -> Self {
         if #available(iOS 11.0, *) {
             let topAnchor = useSafeAreaLayoutGuide ? view.safeAreaLayoutGuide.topAnchor : view.topAnchor
             let leadingAnchor = useSafeAreaLayoutGuide ? view.safeAreaLayoutGuide.leadingAnchor : view.leadingAnchor
@@ -169,11 +180,20 @@ public extension UIView {
 
     @discardableResult
     func childPadding(_ value: DeclarativeEdgeInsets,
-                      useSafeAreaLayoutGuide: Bool = false) -> Self {
+                      useSafeAreaLayoutGuide: Bool = true) -> Self {
         guard let child = subviews.first else { return self }
         child.removeFromSuperview()
         add(child, padding: value, useSafeAreaLayoutGuide: useSafeAreaLayoutGuide)
         return self
+    }
+
+    @discardableResult
+    func padding(_ edges: DeclarativeEdgeInsets.Set,
+                 _ value: CGFloat) -> UIView {
+        UIView()
+            .add(self)
+            .childPadding(DeclarativeEdgeInsets(edges, value),
+                          useSafeAreaLayoutGuide: true)
     }
 
     @discardableResult
@@ -187,16 +207,3 @@ public extension UIView {
     }
 }
 
-public struct DeclarativeEdgeInsets {
-    let top: CGFloat
-    let leading: CGFloat
-    let bottom: CGFloat
-    let trailing: CGFloat
-
-    public init(top: CGFloat, leading: CGFloat, bottom: CGFloat, trailing: CGFloat) {
-        self.top = top
-        self.leading = leading
-        self.bottom = bottom
-        self.trailing = trailing
-    }
-}
