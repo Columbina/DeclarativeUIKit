@@ -9,46 +9,33 @@ Get rid of constraints manipulation and use declarative language to create your 
 
 ```swift
 class DeclarativeViewController: UIViewController {
-    lazy var content: UIView = {
-        VerticalStack()
-            // UIKit's functions are extended so they return Self, allowing chaining.
-            .alignment(.center)
-            // Spacer will try to expand, pushing the content down
-            .spacer()
-            // addArranged works like addArrangedSubview, but will return Self.
-            .addArranged(
+    var body: UIView {
+        VerticalStack {
+            Spacer()
+            
+            UILabel()
+                .text("DeclarativeUIKit")
+                .font(.boldSystemFont(ofSize: 24))
+                .padding(.bottom, 20)
+
+            HorizontalStack {
+                UIImageView()
+                    .image(UIImage(systemName: "heart.fill")?.withTintColor(.red, renderingMode: .alwaysOriginal))
+                    .padding(.trailing, 4)
+                
                 UILabel()
-                    .text("DeclarativeUIKit")
-                    .font(.boldSystemFont(ofSize: 24))
-            )
-            // Spacer with fixed height used for padding.
-            .spacer(height: 40)
-            .addArranged(
-                HorizontalStack()
-                    .addArranged(
-                        UIImageView(
-                            image: UIImage(systemName: "heart.fill")?
-                                    .withTintColor(.red, renderingMode: .alwaysOriginal)
-                        )
-                    )
-                    .spacer(width: 10)
-                    .addArranged(
-                        UILabel()
-                            .text("Create descriptive UIKit screens")
-                            .font(.boldSystemFont(ofSize: 18))
-                    )
-            )
-            .addArranged(
-                UILabel()
-                    .text("faster!")
-                    .font(.italicSystemFont(ofSize: 18))
-            )
-            // Spacer will try to expand, pushing the content up.
-            // Because there is one spacer pushing the content down
-            // and another one pushing the content up, the result
-            // is a centralized content.
-            .spacer()
-    }()
+                    .text("Create descriptive UIKit screens")
+                    .font(.boldSystemFont(ofSize: 18))
+            }
+
+            UILabel()
+                .text("fast!")
+                .font(.italicSystemFont(ofSize: 18))
+
+            Spacer()
+        }
+        .alignment(.center)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,7 +44,7 @@ class DeclarativeViewController: UIViewController {
         // setting `translatesAutoresizingMaskIntoConstraints` to false
         // and connecting the content view with the superview.
         // In other words, by calling `add` with `content`, it will expand the content to fit the view.
-        view.add(content)
+        view.add(body)
     }
 }
 ```
