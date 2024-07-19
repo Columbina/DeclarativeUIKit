@@ -23,7 +23,7 @@ public final class ScrollView: UIScrollView {
     public init(_ axis: AxisSet = .all, _ contentBuilder: () -> UIView?) {
         super.init(frame: .zero)
         if let content = contentBuilder() {
-            add(content)
+            add(content, useSafeAreaLayoutGuide: false)
 
             // In case the ScrollView should scroll
             // to both directions, we don't need to
