@@ -180,11 +180,20 @@ public extension UIView {
 
     @discardableResult
     func childPadding(_ value: DeclarativeEdgeInsets,
-                      useSafeAreaLayoutGuide: Bool = false) -> Self {
+                      useSafeAreaLayoutGuide: Bool = true) -> Self {
         guard let child = subviews.first else { return self }
         child.removeFromSuperview()
         add(child, padding: value, useSafeAreaLayoutGuide: useSafeAreaLayoutGuide)
         return self
+    }
+
+    @discardableResult
+    func padding(_ edges: DeclarativeEdgeInsets.Set,
+                 _ value: CGFloat) -> UIView {
+        UIView()
+            .add(self)
+            .childPadding(DeclarativeEdgeInsets(edges, value),
+                          useSafeAreaLayoutGuide: true)
     }
 
     @discardableResult
@@ -198,16 +207,3 @@ public extension UIView {
     }
 }
 
-public struct DeclarativeEdgeInsets {
-    let top: CGFloat
-    let leading: CGFloat
-    let bottom: CGFloat
-    let trailing: CGFloat
-
-    public init(top: CGFloat, leading: CGFloat, bottom: CGFloat, trailing: CGFloat) {
-        self.top = top
-        self.leading = leading
-        self.bottom = bottom
-        self.trailing = trailing
-    }
-}
